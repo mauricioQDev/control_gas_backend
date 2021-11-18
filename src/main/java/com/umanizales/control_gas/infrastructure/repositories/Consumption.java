@@ -1,17 +1,14 @@
 package com.umanizales.control_gas.infrastructure.repositories;
 
 import com.umanizales.control_gas.domain.ConsumptionDTO;
-import com.umanizales.control_gas.domain.CustomerDTO;
+import org.springframework.beans.BeanUtils;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.BeanUtils;
-
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.UUID;
+import lombok.Data;
 
 @Entity
 @Data
@@ -41,7 +38,7 @@ public class Consumption {
 
     public Consumption(ConsumptionDTO consumptionDTO) {
         BeanUtils.copyProperties(consumptionDTO, this);
-        this.id = UUID.randomUUID().toString();
+        if (consumptionDTO.getId() == null)this.id = UUID.randomUUID().toString();
     }
 
     public ConsumptionDTO toConsumptionDTO(){

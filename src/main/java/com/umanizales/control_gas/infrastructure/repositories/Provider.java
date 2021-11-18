@@ -1,17 +1,13 @@
 package com.umanizales.control_gas.infrastructure.repositories;
 
 import com.umanizales.control_gas.domain.ProviderDTO;
+import org.springframework.beans.BeanUtils;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.BeanUtils;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
+import lombok.Data;
 
 @Entity
 @Data
@@ -30,7 +26,7 @@ public class Provider {
 
     public Provider(ProviderDTO providerDTO) {
         BeanUtils.copyProperties(providerDTO, this);
-        this.id = UUID.randomUUID().toString();
+        if (providerDTO.getId() == null) this.id = UUID.randomUUID().toString();
     }
 
     public ProviderDTO toProviderDTO(){

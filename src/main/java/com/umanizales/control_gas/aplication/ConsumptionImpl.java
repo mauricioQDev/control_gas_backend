@@ -1,10 +1,10 @@
 package com.umanizales.control_gas.aplication;
 
-import com.umanizales.control_gas.domain.ConsumptionDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.umanizales.control_gas.exception.ControlGasException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.umanizales.control_gas.domain.ConsumptionDTO;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -20,13 +20,13 @@ public class ConsumptionImpl implements ConsumptionAble{
     }
 
     @Override
-    public ConsumptionDTO update(ConsumptionDTO consumptionDTO) {
-        return null;
+    public int update(ConsumptionDTO consumptionDTO) throws ControlGasException{
+        return consumptionPersistence.update(consumptionDTO);
     }
 
     @Override
-    public boolean delete(String code) {
-        return false;
+    public boolean delete(String id) throws ControlGasException {
+        return consumptionPersistence.delete(id);
     }
 
     @Override

@@ -1,17 +1,15 @@
 package com.umanizales.control_gas.infrastructure.repositories;
 
 import com.umanizales.control_gas.domain.CustomerDTO;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
-
-import javax.persistence.Basic;
+import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Basic;
 import javax.persistence.Id;
 import java.util.UUID;
+import lombok.Data;
 
 @Entity
 @Data
@@ -49,7 +47,7 @@ public class Customer {
 
     public Customer(CustomerDTO customerDTO) {
         BeanUtils.copyProperties(customerDTO, this);
-        this.id = UUID.randomUUID().toString();
+        if (customerDTO.getId() == null) this.id = UUID.randomUUID().toString();
     }
     
     public CustomerDTO toCustomerDTO(){

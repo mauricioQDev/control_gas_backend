@@ -1,15 +1,15 @@
 package com.umanizales.control_gas.infrastructure.adapters;
 
-import com.umanizales.control_gas.aplication.CustomerAble;
-import com.umanizales.control_gas.domain.CustomerDTO;
-import com.umanizales.control_gas.infrastructure.repositories.Customer;
-import com.umanizales.control_gas.infrastructure.repositories.CustomerRepository;
+import com.umanizales.control_gas.infrastructure.repositories.*;
+import com.umanizales.control_gas.exception.ControlGasException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import com.umanizales.control_gas.aplication.CustomerAble;
+import com.umanizales.control_gas.domain.CustomerDTO;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 import java.util.stream.Collectors;
+import java.util.List;
 
 @Qualifier("PostgresCustomerRepository")
 @Repository("customerPersistence")
@@ -19,33 +19,50 @@ public class PostgresCustomerRepository implements CustomerAble {
     private CustomerRepository customerRepository;
 
     @Override
-    public CustomerDTO save(CustomerDTO customerDTO) {
-        return customerRepository.save(new Customer(customerDTO)).toCustomerDTO();
+    public CustomerDTO save(CustomerDTO customerDTO) throws ControlGasException{
+        if (!checkEmail(customerDTO)){
+            return customerRepository.save(new Customer(customerDTO)).toCustomerDTO();
+        }else throw new ControlGasException("El correo electronico ya esta en uso");
     }
 
     @Override
-    public CustomerDTO update(CustomerDTO customerDTO) {
-//        falta recibir el codigo
-        return customerRepository.save(new Customer(customerDTO)).toCustomerDTO();
+    public int update(CustomerDTO customerDTO) throws ControlGasException {
+        if (customerRepository.existsById(customerDTO.getId())) {
+            try {
+                return customerRepository.update(new Customer(customerDTO));
+            } catch (DataIntegrityViolationException e) {
+                throw new ControlGasException(e.getMessage());
+            }
+        } else throw new ControlGasException("El codigo a modificar no existe " + customerDTO.getId());
     }
 
     @Override
-    public boolean delete(String code) {
-        customerRepository.deleteById(code);
-        return true;
+    public boolean delete(String id) throws ControlGasException {
+        if (customerRepository.existsById(id)) {
+            try {
+                customerRepository.deleteById(id);
+                return true;
+            } catch (DataIntegrityViolationException e) {
+                throw new ControlGasException(e.getMessage());
+            }
+        } else throw new ControlGasException("El codigo a borrar no existe " + id);
     }
 
     @Override
     public List<CustomerDTO> list() {
         //Stream y expresiones lamda
-        List<Customer> customerList = customerRepository.findAll();
-
-       List<CustomerDTO> customerDTOList = customerList.stream().map(Customer::toCustomerDTO).collect(Collectors.toList());
-
-//        List<CustomerDTO> customerDTOList = new ArrayList<>();
-//        for (Customer dog:customerList) {
-//            customerDTOList.add(dog.toCustomerDTO());
-//        }
+        var customerList = customerRepository.findAll();
+        var customerDTOList = customerList.stream().map(Customer::toCustomerDTO).collect(Collectors.toList());
         return customerDTOList;
     }
+
+    @Override
+    public boolean checkEmail(CustomerDTO customerDTO) {
+        var customerDTOList = list();
+        for (CustomerDTO c: customerDTOList) {
+            if (c.getEmail().equals(customerDTO.getEmail())) return true;
+        }
+        return false;
+    }
+
 }

@@ -1,15 +1,16 @@
 package com.umanizales.control_gas.infrastructure.adapters;
 
-import com.umanizales.control_gas.aplication.ProviderAble;
-import com.umanizales.control_gas.domain.ProviderDTO;
-import com.umanizales.control_gas.infrastructure.repositories.Provider;
 import com.umanizales.control_gas.infrastructure.repositories.ProviderRepository;
+import com.umanizales.control_gas.infrastructure.repositories.Provider;
+import com.umanizales.control_gas.exception.ControlGasException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import com.umanizales.control_gas.aplication.ProviderAble;
+import com.umanizales.control_gas.domain.ProviderDTO;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 import java.util.stream.Collectors;
+import java.util.List;
 
 @Qualifier("PostgresProviderRepository")
 @Repository("providerPersistence")
@@ -24,28 +25,33 @@ public class PostgresProviderRepository implements ProviderAble {
     }
 
     @Override
-    public ProviderDTO update(ProviderDTO providerDTO) {
-//        falta recibir el codigo
-        return providerRepository.save(new Provider(providerDTO)).toProviderDTO();
+    public int update(ProviderDTO providerDTO) throws ControlGasException {
+        if (providerRepository.existsById(providerDTO.getId())){
+            try {
+                return providerRepository.update(new Provider(providerDTO));
+            }catch(DataIntegrityViolationException e){
+                throw new ControlGasException(e.getMessage());
+            }
+        }else throw new ControlGasException("El codigo a modificar no existe " + providerDTO.getId());
     }
 
     @Override
-    public boolean delete(String code) {
-        providerRepository.deleteById(code);
-        return true;
+    public boolean delete(String id) throws ControlGasException {
+        if (providerRepository.existsById(id)) {
+            try {
+                providerRepository.deleteById(id);
+                return true;
+            }catch(DataIntegrityViolationException e){
+                throw new ControlGasException(e.getMessage());
+            }
+        } else throw new ControlGasException("El codigo a borrar no existe " + id);
     }
 
     @Override
     public List<ProviderDTO> list() {
         //Stream y expresiones lamda
-        List<Provider> dogList = providerRepository.findAll();
-
-       List<ProviderDTO> ProviderDTOList = dogList.stream().map(Provider::toProviderDTO).collect(Collectors.toList());
-
-//        List<ProviderDTO> ProviderDTOList = new ArrayList<>();
-//        for (Provider dog:dogList) {
-//            ProviderDTOList.add(dog.toProviderDTO());
-//        }
+        var dogList = providerRepository.findAll();
+        var ProviderDTOList = dogList.stream().map(Provider::toProviderDTO).collect(Collectors.toList());
         return ProviderDTOList;
     }
 }

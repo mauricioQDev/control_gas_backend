@@ -1,14 +1,13 @@
 package com.umanizales.control_gas.infrastructure.repositories;
 
 import com.umanizales.control_gas.domain.CylinderDTO;
+import org.springframework.beans.BeanUtils;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Data;
-import org.springframework.beans.BeanUtils;
-
 import javax.persistence.*;
 import java.util.UUID;
+import lombok.Data;
 
 @Entity
 @Data
@@ -31,7 +30,7 @@ public class Cylinder {
 
     public Cylinder(CylinderDTO cylinderDTO) {
         BeanUtils.copyProperties(cylinderDTO, this);
-        this.id = UUID.randomUUID().toString();
+        if (cylinderDTO.getId() == null) this.id = UUID.randomUUID().toString();
     }
 
     public CylinderDTO toCylinderDTO(){

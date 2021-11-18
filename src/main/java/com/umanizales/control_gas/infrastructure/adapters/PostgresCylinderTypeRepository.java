@@ -1,15 +1,16 @@
 package com.umanizales.control_gas.infrastructure.adapters;
 
+import com.umanizales.control_gas.infrastructure.repositories.*;
+import com.umanizales.control_gas.exception.ControlGasException;
 import com.umanizales.control_gas.aplication.CylinderTypeAble;
-import com.umanizales.control_gas.domain.CylinderTypeDTO;
-import com.umanizales.control_gas.infrastructure.repositories.CylinderType;
-import com.umanizales.control_gas.infrastructure.repositories.CylinderTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import com.umanizales.control_gas.domain.CylinderTypeDTO;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.stream.Collectors;
+import java.util.List;
 
 @Qualifier("PostgresCylinderTypeRepository")
 @Repository("cylinderTypePersistence")
@@ -24,28 +25,33 @@ public class PostgresCylinderTypeRepository implements CylinderTypeAble {
     }
 
     @Override
-    public CylinderTypeDTO update(CylinderTypeDTO CylinderTypeDTO) {
-//        falta recibir el codigo
-        return cylindertypeRepository.save(new CylinderType(CylinderTypeDTO)).toCylinderTypeDTO();
+    public int update(CylinderTypeDTO cylinderTypeDTO) throws ControlGasException {
+        if (cylindertypeRepository.existsById(cylinderTypeDTO.getId())) {
+            try {
+                return cylindertypeRepository.update(new CylinderType(cylinderTypeDTO));
+            } catch (DataIntegrityViolationException e) {
+                throw new ControlGasException(e.getMessage());
+            }
+        } else throw new ControlGasException("El codigo a modificar no existe " + cylinderTypeDTO.getId());
     }
 
     @Override
-    public boolean delete(String code) {
-        cylindertypeRepository.deleteById(code);
-        return true;
+    public boolean delete(String id) throws ControlGasException {
+        if (cylindertypeRepository.existsById(id)) {
+            try {
+                cylindertypeRepository.deleteById(id);
+                return true;
+            } catch (DataIntegrityViolationException e) {
+                throw new ControlGasException(e.getMessage());
+            }
+        } else throw new ControlGasException("El codigo a borrar no existe " + id);
     }
 
     @Override
     public List<CylinderTypeDTO> list() {
         //Stream y expresiones lamda
-        List<CylinderType> dogList = cylindertypeRepository.findAll();
-
-       List<CylinderTypeDTO> CylinderTypeDTOList = dogList.stream().map(CylinderType::toCylinderTypeDTO).collect(Collectors.toList());
-
-//        List<CylinderTypeDTO> CylinderTypeDTOList = new ArrayList<>();
-//        for (CylinderType dog:dogList) {
-//            CylinderTypeDTOList.add(dog.toCylinderTypeDTO());
-//        }
+        var dogList = cylindertypeRepository.findAll();
+        var CylinderTypeDTOList = dogList.stream().map(CylinderType::toCylinderTypeDTO).collect(Collectors.toList());
         return CylinderTypeDTOList;
     }
 }

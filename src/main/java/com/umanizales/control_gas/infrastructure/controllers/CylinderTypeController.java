@@ -1,14 +1,14 @@
 package com.umanizales.control_gas.infrastructure.controllers;
 
-import com.umanizales.control_gas.aplication.CylinderTypeImpl;
-import com.umanizales.control_gas.domain.CylinderTypeDTO;
 import com.umanizales.control_gas.infrastructure.controllers.dto.ResponseDTO;
+import com.umanizales.control_gas.exception.ControlGasException;
+import com.umanizales.control_gas.aplication.CylinderTypeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import com.umanizales.control_gas.domain.CylinderTypeDTO;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import javax.validation.Valid;
 
 @RestController
@@ -29,5 +29,15 @@ public class CylinderTypeController {
     @GetMapping
     public @ResponseBody ResponseEntity<ResponseDTO> list(){
         return new ResponseEntity<>(new ResponseDTO("succes", cylinderTypeImpl.list(), null), HttpStatus.OK);
+    }
+
+    @PutMapping
+    public @ResponseBody ResponseEntity<ResponseDTO> update(@RequestBody @Valid CylinderTypeDTO cylinderTypeDTO) throws ControlGasException{
+        return new ResponseEntity<>(new ResponseDTO("succes", cylinderTypeImpl.update(cylinderTypeDTO), null), HttpStatus.OK);
+    }
+
+    @DeleteMapping("{id}")
+    public @ResponseBody ResponseEntity<ResponseDTO> delete(@PathVariable String id) throws ControlGasException {
+        return new ResponseEntity<>(new ResponseDTO("succes", cylinderTypeImpl.delete(id), null), HttpStatus.OK);
     }
 }
