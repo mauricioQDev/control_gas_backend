@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import com.umanizales.control_gas.aplication.CustomerAble;
 import com.umanizales.control_gas.domain.CustomerDTO;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.List;
 
@@ -51,14 +53,18 @@ public class PostgresCustomerRepository implements CustomerAble {
     @Override
     public List<CustomerDTO> list() {
         //Stream y expresiones lamda
-        var customerList = customerRepository.findAll();
-        var customerDTOList = customerList.stream().map(Customer::toCustomerDTO).collect(Collectors.toList());
+        List<Customer> customerList = customerRepository.findAll();
+        List customerDTOList = new ArrayList<>();
+        for (Customer customer : customerList) {
+            CustomerDTO toCustomerDTO = customer.toCustomerDTO();
+            customerDTOList.add(toCustomerDTO);
+        }
         return customerDTOList;
     }
 
     @Override
     public boolean checkEmail(CustomerDTO customerDTO) {
-        var customerDTOList = list();
+        List<CustomerDTO> customerDTOList = list();
         for (CustomerDTO c: customerDTOList) {
             if (c.getEmail().equals(customerDTO.getEmail())) return true;
         }

@@ -15,7 +15,7 @@ import javax.validation.Valid;
 @Validated
 @RestController
 @RequestMapping(path = "/customer")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://mquinteroweb.pro2umanizales.com")
 public class CustomerController {
 
     @Autowired

@@ -9,7 +9,8 @@ import com.umanizales.control_gas.aplication.ProviderAble;
 import com.umanizales.control_gas.domain.ProviderDTO;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
-import java.util.stream.Collectors;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Qualifier("PostgresProviderRepository")
@@ -50,8 +51,12 @@ public class PostgresProviderRepository implements ProviderAble {
     @Override
     public List<ProviderDTO> list() {
         //Stream y expresiones lamda
-        var dogList = providerRepository.findAll();
-        var ProviderDTOList = dogList.stream().map(Provider::toProviderDTO).collect(Collectors.toList());
+        List<Provider> dogList = providerRepository.findAll();
+        List ProviderDTOList = new ArrayList<>();
+        for (Provider provider : dogList) {
+            ProviderDTO toProviderDTO = provider.toProviderDTO();
+            ProviderDTOList.add(toProviderDTO);
+        }
         return ProviderDTOList;
     }
 }

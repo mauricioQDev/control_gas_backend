@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import com.umanizales.control_gas.aplication.ConsumptionAble;
 import com.umanizales.control_gas.domain.ConsumptionDTO;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.List;
 
@@ -50,8 +52,12 @@ public class PostgresConsumptionRepository implements ConsumptionAble {
     @Override
     public List<ConsumptionDTO> list() {
         //Stream y expresiones lamda
-        var dogList = consumptionRepository.findAll();
-        var ConsumptionDTOList = dogList.stream().map(Consumption::toConsumptionDTO).collect(Collectors.toList());
+        List<Consumption> dogList = consumptionRepository.findAll();
+        List ConsumptionDTOList = new ArrayList<>();
+        for (Consumption consumption : dogList) {
+            ConsumptionDTO toConsumptionDTO = consumption.toConsumptionDTO();
+            ConsumptionDTOList.add(toConsumptionDTO);
+        }
         return ConsumptionDTOList;
     }
 }

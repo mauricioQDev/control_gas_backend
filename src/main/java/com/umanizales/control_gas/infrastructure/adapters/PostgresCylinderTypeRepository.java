@@ -9,6 +9,7 @@ import com.umanizales.control_gas.domain.CylinderTypeDTO;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.List;
 
@@ -50,8 +51,12 @@ public class PostgresCylinderTypeRepository implements CylinderTypeAble {
     @Override
     public List<CylinderTypeDTO> list() {
         //Stream y expresiones lamda
-        var dogList = cylindertypeRepository.findAll();
-        var CylinderTypeDTOList = dogList.stream().map(CylinderType::toCylinderTypeDTO).collect(Collectors.toList());
+        List<CylinderType> dogList = cylindertypeRepository.findAll();
+        List CylinderTypeDTOList = new ArrayList<>();
+        for (CylinderType cylinderType : dogList) {
+            CylinderTypeDTO toCylinderTypeDTO = cylinderType.toCylinderTypeDTO();
+            CylinderTypeDTOList.add(toCylinderTypeDTO);
+        }
         return CylinderTypeDTOList;
     }
 }
